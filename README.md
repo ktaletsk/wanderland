@@ -5,6 +5,10 @@
 </p>
 </h1>
 
+<p align="center">
+  <img src="assets/wanderland.svg" width="300" alt="A top-down Wanderland grid: a red agent facing a locked yellow door, a key, and a goal ring">
+</p>
+
 An interactive low-poly **3D coding playground** as an [anywidget](https://anywidget.dev),
 built for Python notebooks. Write simple Python commands and watch a charming
 little character — **Mo the Mossball** — animate through a stylized world, collecting
