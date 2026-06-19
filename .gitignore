@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# marimo
+__marimo__/
+
+# Node
+node_modules/
+
+# Test artifacts (regenerable screenshots + bundled test entry)
+test/*.png
+test/expr_bundle.js
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# internal planning (not tracked)
+todo.md

@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../src/wanderland/static/index.css" />
+    <style>
+      body { margin: 0; background: #e8f4ff; }
+      #host { width: 720px; height: 540px; margin: 20px auto; }
+    </style>
+  </head>
+  <body>
+    <div id="host"></div>
+    <script type="module">
+      import widget from "../src/wanderland/static/index.js";
+      class MockModel {
+        constructor(s) { this.s = s; this.h = {}; }
+        get(k) { return this.s[k]; }
+        set(k, v) { this.s[k] = v; }
+        save_changes() {}
+        on(ev, fn) { (this.h[ev] = this.h[ev] || []).push(fn); }
+        off() {}
+        emit(ev) { (this.h[ev] || []).forEach((f) => f()); }
+      }
+      const params = new URLSearchParams(location.search);
+      const fxFile = params.get("fx") || "fixture.json";
+      const fx = await (await fetch("./" + fxFile)).json();
+      const model = new MockModel({
+        puzzle: fx.puzzle, timeline: fx.timeline, result: fx.result,
+        load_nonce: 0, run_nonce: 0, speed: 1, state: {},
+        character: params.get("char") || "mo",
+      });
+      widget.render({ model, el: document.getElementById("host") });
+      window.__play = (speed) => {
+        model.s.speed = speed || 1;
+        model.s.run_nonce += 1;
+        model.emit("change:run_nonce");
+      };
+      window.__ready = true;
+    </script>
+  </body>
+</html>

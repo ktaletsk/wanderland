@@ -1,0 +1,17 @@
+{
+  "name": "wanderland-frontend",
+  "private": true,
+  "type": "module",
+  "description": "Three.js frontend for the wanderland anywidget",
+  "scripts": {
+    "build": "esbuild js/index.js --bundle --format=esm --minify --outfile=src/wanderland/static/index.js",
+    "dev": "esbuild js/index.js --bundle --format=esm --sourcemap --watch --outfile=src/wanderland/static/index.js"
+  },
+  "dependencies": {
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "playwright": "^1.61.0"
+  }
+}
