@@ -109,6 +109,7 @@ class Puzzle:
     goal: tuple[int, int] | None = None
     gaps: list[tuple[int, int]] = field(default_factory=list)
     walls: list[tuple[int, int]] = field(default_factory=list)
+    lava: list[tuple[int, int]] = field(default_factory=list)
     heights: dict[tuple[int, int], int] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -129,6 +130,10 @@ class Puzzle:
     @property
     def wall_set(self) -> set[tuple[int, int]]:
         return {tuple(w) for w in self.walls}
+
+    @property
+    def lava_set(self) -> set[tuple[int, int]]:
+        return {tuple(x) for x in self.lava}
 
     @property
     def gem_cells(self) -> list[tuple[int, int]]:
@@ -160,6 +165,7 @@ class Puzzle:
             "goal": list(self.goal) if self.goal is not None else None,
             "gaps": [list(g) for g in self.gaps],
             "walls": [list(w) for w in self.walls],
+            "lava": [list(x) for x in self.lava],
             "heights": {f"{c},{r}": v for (c, r), v in self.heights.items()},
         }
 
@@ -222,7 +228,8 @@ def from_ascii(
     ``S``        start tile, heading from the ``heading=`` argument
     ``.``        walkable floor
     ``#``        wall -- not walkable (the universal ``#``-is-wall convention)
-    ``~``        water -- not walkable (Byte-flavored; treated as a wall)
+    ``~``        water -- not walkable (treated as a wall)
+    ``!``        lava -- WALKABLE but deadly: stepping in ends the run (death)
     ``O``        goal tile (walkable; won by stepping on it)
     ``G``        a blocking gem -- carried via pickup() from the front
     ``g``        a non-blocking gem -- collected by walking onto it
@@ -252,6 +259,7 @@ def from_ascii(
     objects: dict[tuple[int, int], Obj] = {}
     gaps: list[tuple[int, int]] = []
     walls: list[tuple[int, int]] = []
+    lava: list[tuple[int, int]] = []
     ascii_goal: tuple[int, int] | None = None
 
     for r, line in enumerate(lines):
@@ -263,6 +271,8 @@ def from_ascii(
                 walls.append(cell)
             elif token == "~":
                 gaps.append(cell)  # water: impassable (rendered as a fall, wall-like)
+            elif token == "!":
+                lava.append(cell)  # lava: walkable but deadly -- stepping in = death
             elif token in DIR_GLYPHS:
                 start, start_heading = cell, DIR_GLYPHS[token]
             elif token == "S":
@@ -286,6 +296,7 @@ def from_ascii(
         goal=goal if goal is not None else ascii_goal,
         gaps=gaps,
         walls=walls,
+        lava=lava,
     )
 
 
@@ -319,6 +330,7 @@ def from_dict(d: dict) -> Puzzle:
         goal=tuple(d["goal"]) if d.get("goal") else None,
         gaps=_cells(d.get("gaps", [])),
         walls=_cells(d.get("walls", [])),
+        lava=_cells(d.get("lava", [])),
         heights=heights,
     )
 

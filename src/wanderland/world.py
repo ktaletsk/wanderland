@@ -33,6 +33,8 @@ _STATIC = pathlib.Path(__file__).parent / "static"
 
 # heading int <-> name. 0=N, 1=E, 2=S, 3=W.
 _HEADING_TO_INT = {"N": 0, "E": 1, "S": 2, "W": 3}
+# (dcol, drow) for a forward step at each heading (row grows southward).
+_DELTA = {0: (0, -1), 1: (1, 0), 2: (0, 1), 3: (-1, 0)}
 
 _EMPTY_RESULT = {
     "ran": False,
@@ -42,6 +44,7 @@ _EMPTY_RESULT = {
     "total_gems": 0,
     "final": None,
     "carrying": None,
+    "died": False,
     "steps": 0,
 }
 
@@ -184,6 +187,121 @@ class World(anywidget.AnyWidget):
         self._execute(_program, autoplay=play)
         return self.result
 
+    def replay(self, frames, *, success=None, play: bool = True):
+        """Animate an **external** trace -- a trajectory produced by some *other*
+        executor (not Wanderland's own sim). Use this to render a run scored
+        elsewhere without re-simulating it (e.g. a separate grid engine).
+
+        ``frames`` is a list of per-step dicts, each the state AFTER one action::
+
+            {"action":   "move_forward",          # the verb taken (drives the event)
+             "pos":      [col, row],               # resulting position (or col=/row=)
+             "dir":      0..3,                     # resulting heading, 0=N 1=E 2=S 3=W
+                                                   #   (or "N".."W", or dir=/h=/heading=)
+             "carrying": {"type", "color"} | None} # optional
+
+        Heading uses Wanderland's convention (0=N,1=E,2=S,3=W) -- convert any
+        other convention before calling. The agent's start is the puzzle's start;
+        each frame's ``action`` labels the event (so a ``move_forward`` whose
+        position did *not* change renders as a *blocked* move -- the failed-plan
+        animation). ``success`` overrides the displayed verdict (e.g. an external
+        scorer's); else it is derived from the final pose. Returns the result dict.
+        """
+        p = self._puzzle
+        names = {"N": 0, "E": 1, "S": 2, "W": 3}
+        # a probe carrying the initial objects, for blocked-reason + toggle lookups
+        probe = actions.SimState(
+            col=p.start[0], row=p.start[1], heading=_HEADING_TO_INT[p.heading],
+            carrying=None, objects={c: o.copy() for c, o in p.objects.items()}, puzzle=p,
+        )
+        prev = {"col": p.start[0], "row": p.start[1], "h": _HEADING_TO_INT[p.heading], "carrying": None}
+
+        def norm(f):
+            pos = f.get("pos")
+            h = f.get("dir", f.get("h", f.get("heading", prev["h"])))
+            return {
+                "col": pos[0] if pos else f.get("col", prev["col"]),
+                "row": pos[1] if pos else f.get("row", prev["row"]),
+                "h": names[h] if isinstance(h, str) else h,
+                "carrying": f.get("carrying", prev["carrying"]),
+            }
+
+        def pose(s):
+            return {"col": s["col"], "row": s["row"], "h": s["h"]}
+
+        timeline, gems = [], 0
+        for i, f in enumerate(frames):
+            cur = norm(f)
+            act = f.get("action")
+            moved = (cur["col"], cur["row"]) != (prev["col"], prev["row"])
+            carry_changed = (cur["carrying"] is None) != (prev["carrying"] is None)
+            step = {"i": i, "cmd": act or "?", "from": pose(prev), "to": pose(cur)}
+            fc, fr = prev["col"] + _DELTA[prev["h"]][0], prev["row"] + _DELTA[prev["h"]][1]
+
+            if act in ("turn_left", "turn_right"):
+                step.update(kind="turn", ok=True)
+            elif act in ("move_forward", "move_backward") or (moved and not act):
+                if moved:
+                    step.update(kind="move", ok=True, target=pose(cur))
+                    if (cur["col"], cur["row"]) in p.lava_set:
+                        step["died"] = True
+                else:  # action taken but didn't move -> blocked (the flail)
+                    sign = -1 if act == "move_backward" else 1
+                    tgt = (prev["col"] + sign * _DELTA[prev["h"]][0], prev["row"] + sign * _DELTA[prev["h"]][1])
+                    step.update(kind="move", ok=False, to=pose(prev),
+                                blocked_by=probe.block_reason(*tgt) or "wall",
+                                target={"col": tgt[0], "row": tgt[1], "h": prev["h"]})
+            elif act in ("pickup", "drop"):
+                step.update(kind=act, ok=carry_changed, to=pose(prev), cell=[fc, fr],
+                            carrying=cur["carrying"])
+                held = cur["carrying"] if act == "pickup" else prev["carrying"]
+                if carry_changed and held:
+                    step["obj"] = held
+            elif act == "toggle":
+                door = probe.objects.get((fc, fr))
+                effect = "open"
+                if door is not None and door.type == "door":
+                    effect = "unlock" if door.state == "locked" else ("close" if door.state == "open" else "open")
+                    door.state = "closed" if effect == "close" else "open"
+                elif door is not None and door.type == "box":
+                    effect = "open_box"
+                step.update(kind="toggle", ok=True, to=pose(prev), cell=[fc, fr],
+                            effect=effect, carrying=cur["carrying"])
+            elif act == "collect_gem":
+                step.update(kind="collect", ok=True, to=pose(prev), gem=[prev["col"], prev["row"]])
+                gems += 1
+            else:  # no action hint -> infer from the pose delta
+                step["kind"] = "move" if moved else "turn"
+                step["ok"] = True
+                if moved:
+                    step["target"] = pose(cur)
+
+            timeline.append(step)
+            prev = cur
+            if step.get("died"):
+                break
+
+        goal = tuple(p.goal) if p.goal is not None else None
+        reached = goal is None or (prev["col"], prev["row"]) == goal
+        died = any(s.get("died") for s in timeline)
+        self.timeline = timeline
+        self.result = {
+            "ran": True,
+            "success": bool(success if success is not None else (reached and not died)),
+            "reached_goal": reached,
+            "gems_collected": gems,
+            "total_gems": len(p.score_gem_cells),
+            "final": _pose(prev["col"], prev["row"], prev["h"]),
+            "carrying": prev["carrying"],
+            "died": died,
+            "steps": len(timeline),
+        }
+        self.state = {}
+        self.load_nonce += 1
+        if play:
+            self.run_nonce += 1
+        return self.result
+
     def reset(self) -> None:
         """Clear any program back to the puzzle's start state."""
         self.timeline = []
@@ -207,19 +325,22 @@ class World(anywidget.AnyWidget):
         for i, cmd in enumerate(cmds):
             step = actions.get(cmd).handler(state)  # mutates state, returns step
             timeline.append({"i": i, "cmd": cmd, **step})
+            if state.dead:
+                break  # stepped into lava -- the episode ends here
 
         total = len(p.score_gem_cells)
         collected = sum(1 for s in timeline if s.get("collected"))  # gem events
         reached_goal = p.goal is None or (state.col, state.row) == tuple(p.goal)
         result = {
             "ran": True,
-            "success": collected >= total and reached_goal,
+            "success": collected >= total and reached_goal and not state.dead,
             "reached_goal": reached_goal,
             "gems_collected": collected,
             "total_gems": total,
             "final": _pose(state.col, state.row, state.heading),
             "carrying": state.carrying.to_dict() if state.carrying else None,
-            "steps": len(cmds),
+            "died": state.dead,
+            "steps": len(timeline),
         }
 
         # Idempotent load: in marimo, the frontend reporting a finished run writes

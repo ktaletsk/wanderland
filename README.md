@@ -160,7 +160,7 @@ Each cell is one whitespace-separated token; the top row is north, columns go ea
 | token | meaning |
 |---|---|
 | `^ > v <` | start tile **and** the agent's facing (N/E/S/W) — `S` also works with `heading=` |
-| `.` `#` `~` `O` | floor · **wall** · water (impassable) · goal |
+| `.` `#` `~` `!` `O` | floor · **wall** · water (impassable) · **lava** (walkable but deadly) · goal |
 | `g` / `G` | non-blocking gem (walk on, then `collect_gem()`) / blocking gem (`pickup()` from the front) |
 | `Kc` `Bc` `Xc` | key / ball / box of color `c` (`r g b p y e`) — `Xc:obj` gives a box hidden contents |
 | `Dc` `Lc` | closed / locked door of color `c` |
@@ -211,16 +211,20 @@ from wanderland import World, random_room, solve, from_json, to_json
 
 puzzle = random_room(seed=7, gems=1)         # a reproducible, solvable grid room
 env = World(puzzle)
-env.act(["turn_left", "move_forward", ...])  # run a list of action names (the agent's output)
+env.act(["turn_left", "move_forward", ...])  # Wanderland executes a list of action names
 env.success, env.result                      # authoritative + synchronous (no browser needed)
+env.replay(trace)                            # animate a trajectory scored by ANOTHER executor
+                                             #   (a list of {action, pos, dir, carrying} steps)
 
 plan = solve(puzzle)                         # BFS oracle: a shortest solving plan (baseline)
 spec = to_json(puzzle); from_json(spec)      # save / load a world as JSON
 ```
 
 `act()` validates each name against the action space (unknown/out-of-space verbs raise, so a
-measured run can't cheat). `random_room` is deterministic in `seed` and solvable by
-construction; `solve()` proves it and serves as a reference agent.
+measured run can't cheat). `replay()` renders an *external* trace without re-simulating it —
+a `move_forward` that didn't change position animates as a blocked bonk, and stepping into
+lava plays a death — so failed plans are shown faithfully. `random_room` is deterministic in
+`seed` and solvable by construction; `solve()` proves it and serves as a reference agent.
 
 ---
 

@@ -209,6 +209,7 @@ export class Viewer {
         const to = this.board.worldPos(step.to.col, step.to.row);
         await this.character.move(from, to, ctx);
         this.pose = { ...step.to };
+        if (step.died) await this.character.react("die", ctx); // walked into lava
       } else {
         const target = this.board.worldPos(step.target.col, step.target.row);
         const dir = target.clone().sub(from).normalize();

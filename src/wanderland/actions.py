@@ -43,7 +43,8 @@ class SimState:
     heading: int
     carrying: object | None  # a puzzles.Obj or None (duck-typed)
     objects: dict  # (col, row) -> puzzles.Obj ; mutated by pickup/drop/toggle
-    puzzle: object  # the Puzzle (for bounds / gaps / walls / heights)
+    puzzle: object  # the Puzzle (for bounds / gaps / walls / lava / heights)
+    dead: bool = False  # True once the agent steps into lava (episode over)
 
     @property
     def pose(self) -> dict:
@@ -75,6 +76,7 @@ class SimState:
             self.in_bounds(c, r)
             and (c, r) not in p.gap_set
             and (c, r) not in p.wall_set
+            and (c, r) not in p.lava_set
             and self.objects.get((c, r)) is None
         )
 
@@ -143,6 +145,9 @@ def _step_move(state: SimState, sign: int) -> dict:
     else:
         step["to"] = _pose(tc, tr, state.heading)
         state.col, state.row = tc, tr
+        if (tc, tr) in state.puzzle.lava_set:
+            state.dead = True  # walked into lava -> the run ends here
+            step["died"] = True
     return step
 
 

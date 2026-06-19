@@ -146,6 +146,16 @@ export class RoverCharacter extends Character {
       this.group.rotation.y = base;
       hull.position.y = HOVER;
       hull.rotation.z = 0;
+    } else if (kind === "die") {
+      // stepped into lava: stall, drop, and vanish
+      this._setFace("surprised");
+      await ctx.tween(650 / ctx.spd, (t) => t, (e) => {
+        hull.position.y = HOVER - e * e * 0.95;
+        hull.rotation.z = Math.sin(e * Math.PI * 7) * 0.5 * (1 - e);
+        this._spinRotors(e * 40);
+      });
+      this.group.visible = false;
+      return;
     }
     this._setFace(this._mood);
   }

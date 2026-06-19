@@ -222,6 +222,18 @@ export class MossballCharacter extends Character {
       g.rotation.y = base;
       rig.scale.set(1, 1, 1);
       rig.rotation.set(0, 0, 0);
+    } else if (kind === "die") {
+      // stepped into lava: a panicked flail, sink, and vanish
+      this._setFace("surprised");
+      const rig = this.rig;
+      await ctx.tween(650 / ctx.spd, (t) => t, (e) => {
+        g.position.y = -0.78 * e * e; // accelerating sink
+        const s = 1 - 0.5 * e;
+        rig.scale.set(s, s, s);
+        rig.rotation.y = Math.sin(e * Math.PI * 6) * 0.4 * (1 - e);
+      });
+      g.visible = false;
+      return; // gone -- don't restore the mood
     }
     this._setFace(this._mood); // back to baseline
   }

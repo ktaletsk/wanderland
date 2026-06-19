@@ -30,6 +30,7 @@ export class Character {
   placeAt(pos, heading) {
     this.group.position.set(pos.x, 0, pos.z);
     this.group.rotation.set(0, heading, 0);
+    this.group.visible = true; // a death may have hidden it
   }
 
   // Walk one tile from `from` to `to`.
@@ -72,10 +73,12 @@ export class Character {
     this.group.rotation.y = a1;
   }
 
-  // A momentary flourish in response to an event. `kind` is a semantic label --
-  // currently 'cheer' (collected something) or 'confused' (nothing to collect);
-  // future world objects will add more (e.g. 'pickup', 'unlock'). No-op default.
-  async react(kind, ctx) {}
+  // A momentary flourish in response to an event. `kind` is a semantic label:
+  // 'cheer' (collected something), 'confused' (nothing there), 'win' (solved),
+  // 'die' (stepped into lava). Default just hides the character on death.
+  async react(kind, ctx) {
+    if (kind === "die") this.group.visible = false;
+  }
 
   // Set the character's emotional baseline. `name` is a standard intent the
   // character maps onto its own face however it can (or ignores):

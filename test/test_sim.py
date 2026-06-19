@@ -215,6 +215,26 @@ check("render: emits a valid PNG (stdlib)", img.to_png()[:8] == b"\x89PNG\r\n\x1
 check("render: distinct worlds produce distinct images",
       render(random_room(seed=1)).to_png() != render(random_room(seed=2)).to_png())
 
+# 18) lava: walkable but deadly -- ends the run; the oracle avoids it ----------
+lw = World(from_ascii("lava", "> . O\n! ! .", actions=WALK))
+r = lw.act(["turn_right", "move_forward"])  # step south into lava
+check("lava kills: died and not success", r["died"] is True and r["success"] is False)
+check("lava truncates the run at death", lw.timeline[-1].get("died") is True)
+check("oracle routes around lava", solve(lw._puzzle) == ["move_forward", "move_forward"])
+
+# 19) external-trace replay (render a trajectory from another executor) --------
+rpw = World(from_ascii("rp", "> . # .", actions=WALK))
+rpw.replay(
+    [{"action": "move_forward", "pos": [1, 0], "dir": "E"},
+     {"action": "move_forward", "pos": [1, 0], "dir": "E"}],  # 2nd: into wall (2,0)
+    play=False,
+)
+check("replay: a step that moved is an ok move", rpw.timeline[0]["kind"] == "move" and rpw.timeline[0]["ok"])
+check("replay: an action that didn't move is a blocked move",
+      rpw.timeline[1]["ok"] is False and rpw.timeline[1]["blocked_by"] == "wall")
+check("replay: success can be overridden (external scorer)",
+      rpw.replay([{"action": "move_forward", "pos": [1, 0], "dir": "E"}], success=True, play=False)["success"] is True)
+
 # ---------------------------------------------------------------------------
 print()
 if _fails:

@@ -22,6 +22,7 @@ _FLOOR = (171, 199, 124)
 _FLOOR_LINE = (151, 179, 106)
 _WALL = (128, 136, 146)
 _WATER = (92, 162, 200)
+_LAVA = (231, 110, 52)
 _AGENT = (214, 74, 58)
 _GOAL = (240, 200, 74)
 _GEM = (70, 205, 235)
@@ -171,7 +172,7 @@ def render(target, *, tile: int = 24) -> Image:
     p = state.puzzle
     img = Image(p.cols * tile, p.rows * tile)
     goal = tuple(p.goal) if p.goal is not None else None
-    walls, gaps = p.wall_set, p.gap_set
+    walls, gaps, lava = p.wall_set, p.gap_set, p.lava_set
 
     for r in range(p.rows):
         for c in range(p.cols):
@@ -179,6 +180,8 @@ def render(target, *, tile: int = 24) -> Image:
                 bg = _WALL
             elif (c, r) in gaps:
                 bg = _WATER
+            elif (c, r) in lava:
+                bg = _LAVA
             else:
                 bg = _FLOOR
             obj = state.objects.get((c, r))

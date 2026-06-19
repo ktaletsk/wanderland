@@ -34,19 +34,23 @@ export class Board {
   _build() {
     const p = this.puzzle;
     const gapSet = new Set((p.gaps || []).map(([c, r]) => `${c},${r}`));
+    const lavaSet = new Set((p.lava || []).map(([c, r]) => `${c},${r}`));
 
     const grassMat = new THREE.MeshStandardMaterial({ color: COLORS.grass, roughness: 0.95, flatShading: true });
     const dirtMat = new THREE.MeshStandardMaterial({ color: COLORS.dirt, roughness: 1.0, flatShading: true });
+    const lavaMat = new THREE.MeshStandardMaterial({ color: 0xe7430f, emissive: 0xd02400, emissiveIntensity: 0.7, roughness: 0.6 });
+    this._lavaMat = lavaMat; // pulsed in tick()
 
     for (let r = 0; r < p.rows; r++) {
       for (let c = 0; c < p.cols; c++) {
         if (gapSet.has(`${c},${r}`)) continue;
         const pos = this.worldPos(c, r);
-        const grass = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.2, 0.96), grassMat);
-        grass.position.set(pos.x, -0.1, pos.z);
-        grass.receiveShadow = true;
-        grass.castShadow = true;
-        this.group.add(grass);
+        const lava = lavaSet.has(`${c},${r}`);
+        const surf = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.2, 0.96), lava ? lavaMat : grassMat);
+        surf.position.set(pos.x, lava ? -0.13 : -0.1, pos.z); // lava sits slightly lower
+        surf.receiveShadow = !lava;
+        surf.castShadow = !lava;
+        this.group.add(surf);
         const dirt = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.55, 0.86), dirtMat);
         dirt.position.set(pos.x, -0.47, pos.z);
         dirt.receiveShadow = true;
@@ -193,6 +197,7 @@ export class Board {
       e.group.rotation.y = t * 1.1;
       e.group.position.y = 0.28 + Math.sin(t * 2 + e.base.x) * 0.05;
     }
+    if (this._lavaMat) this._lavaMat.emissiveIntensity = 0.6 + Math.sin(t * 3) * 0.2;
     if (this.goalRing) this.goalRing.rotation.z = t * 0.6;
   }
 

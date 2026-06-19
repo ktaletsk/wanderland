@@ -68,6 +68,8 @@ def solve(puzzle, *, max_nodes: int = 300_000):
             nodes += 1
             nxt = _clone(state)
             _actions.get(name).handler(nxt)
+            if nxt.dead:
+                continue  # walked into lava -- a dead end the oracle won't take
             k = _key(nxt)
             if k in seen:
                 continue
