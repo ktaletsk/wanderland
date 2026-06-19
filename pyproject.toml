@@ -13,9 +13,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Agent / RL extras: numpy for image observations (render().to_numpy()).
+rl = [
+    "numpy>=1.21",
+]
 dev = [
     "marimo>=0.9",
     "watchfiles>=0.21",
+    "numpy>=1.21",
 ]
 
 [build-system]

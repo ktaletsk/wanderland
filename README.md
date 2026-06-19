@@ -1,7 +1,12 @@
-# 🌱 Wanderland
+<h1>
+<p align="center">
+  🌱
+  <br>Wanderland
+</p>
+</h1>
 
 An interactive low-poly **3D coding playground** as an [anywidget](https://anywidget.dev),
-built for [marimo](https://marimo.io). Write simple Python commands and watch a charming
+built for Python notebooks. Write simple Python commands and watch a charming
 little character — **Mo the Mossball** — animate through a stylized world, collecting
 gems and reaching goals.
 
@@ -173,19 +178,20 @@ Each cell is one whitespace-separated token; the top row is north, columns go ea
 Wanderland doubles as a substrate for **agent / LLM evaluation** on grid-world tasks.
 The research notebook is **`rl_playground.py`** (`uv run marimo edit rl_playground.py`).
 
-**Prompt the agent — the same world, two encodings:**
+**Show the agent the world — three encodings of the same state:**
 
 ```python
-print(world.to_prompt("structured"))   # the canonical, measured input
-print(world.to_prompt("ascii"))        # a second view of the same state
-world.action_space                     # the verbs you hand the agent
-world.actions_doc                      # [{name, doc}, ...] for the prompt
+print(world.to_prompt("structured"))   # text: the canonical, measured input
+print(world.to_prompt("ascii"))        # text: a grid picture
+world.render().save("obs.png")         # a 2D top-down image (stdlib PNG, no browser)
+world.render().to_numpy()              # (H, W, 3) uint8 for vision models (needs numpy)
+world.action_space, world.actions_doc  # the verbs you hand the agent (+ docs)
 ```
 
 `structured` is an explicit header + a coordinate-tagged object list (usually a stronger
-prompt for an LLM than a raw grid picture); `ascii` is a picture. Both render from the one source of
-truth and **hide box contents until toggled**, so you can show the identical world two ways
-and measure how much the encoding alone moves success rate. Example `structured`:
+prompt for an LLM than a raw grid picture); `ascii` and `render()` are picture views. All
+**hide box contents until toggled**, so you can show the identical world three ways and
+measure how much the encoding alone moves success rate. Example `structured`:
 
 ```
 World: Locked Room  (4 wide x 3 tall; x east, y south, origin top-left)
@@ -295,6 +301,7 @@ src/wanderland/   # Python package
   puzzles.py         # Puzzle + objects + from_ascii/from_dict/to_json + to_prompt + built-ins
   generate.py        # random_room(): a reproducible distribution of solvable rooms
   solve.py           # solve(): a BFS oracle (shortest solving plan / baseline)
+  render.py          # render(): a 2D top-down image observation (stdlib PNG; numpy optional)
   world.py           # the AnyWidget: capture -> simulate -> sync; action_space; act()
   static/            # built frontend (index.js, index.css)
 

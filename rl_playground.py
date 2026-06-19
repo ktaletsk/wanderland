@@ -65,10 +65,11 @@ def _(mo):
     mo.md(r"""
     ## 2 · What the agent sees
 
-    The **structured** representation is the canonical, measured prompt (an explicit
-    header + a coordinate-tagged object list). The **ascii** view renders the *same*
-    state as a picture. Box contents stay hidden until opened. Hand a model either
-    one and compare — same world, different encoding.
+    Three encodings of the *same* state: **structured** text (the canonical, measured
+    prompt — an explicit header + a coordinate-tagged object list), an **ascii** view,
+    and a 2D **image** observation (`render()`) for vision models. Box contents stay
+    hidden until opened. Hand a model any of them and compare — same world, different
+    encoding.
     """)
     return
 
@@ -88,6 +89,13 @@ def _(env, mo):
     {env.to_prompt("ascii")}
     ```
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(env, mo):
+    # render() — the 2D top-down image observation (headless, no browser)
+    mo.image(env.render(tile=32).to_png(), width=env.puzzle["cols"] * 32)
     return
 
 

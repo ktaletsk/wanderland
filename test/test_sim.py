@@ -20,6 +20,7 @@ from wanderland import (
     move_forward,
     pickup,
     random_room,
+    render,
     solve,
     to_json,
     toggle,
@@ -206,6 +207,13 @@ for seed in range(8):
     gen_ok = gen_ok and plan is not None and World(rp).act(plan)["success"]
 check("random_room worlds are solvable (oracle-verified)", gen_ok)
 check("solve() returns an action list (oracle baseline)", isinstance(solve(gen), list))
+
+# 17) image observation renderer (2D top-down) --------------------------------
+img = World(from_ascii("img", "> . #\n. Ly .\nKy . O", actions=SIX)).render(tile=20)
+check("render: image size = cols*tile x rows*tile", img.width == 3 * 20 and img.height == 3 * 20)
+check("render: emits a valid PNG (stdlib)", img.to_png()[:8] == b"\x89PNG\r\n\x1a\n")
+check("render: distinct worlds produce distinct images",
+      render(random_room(seed=1)).to_png() != render(random_room(seed=2)).to_png())
 
 # ---------------------------------------------------------------------------
 print()

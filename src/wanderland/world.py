@@ -270,6 +270,15 @@ class World(anywidget.AnyWidget):
             return render_ascii(self._puzzle)
         raise ValueError(f"unknown format {fmt!r}; use 'structured' or 'ascii'")
 
+    def render(self, *, tile: int = 24):
+        """Render the world's start state to a top-down 2D image -- the third
+        agent observation alongside ``to_prompt('structured'|'ascii')``. Returns
+        a :class:`wanderland.render.Image` (``.to_png()`` / ``.to_numpy()`` /
+        ``.save(path)``); ``tile`` is the pixel size per cell."""
+        from .render import render as _render
+
+        return _render(self._puzzle, tile=tile)
+
     # --- convenient Python-side readback --------------------------------
     @property
     def total_gems(self) -> int:

@@ -37,6 +37,7 @@ from .commands import (
 )
 from .generate import random_room
 from .puzzles import Obj, Puzzle, from_ascii, from_dict, from_json, to_json
+from .render import render
 from .solve import solve
 from .world import World
 
@@ -52,6 +53,7 @@ __all__ = [
     "from_json",
     "random_room",
     "solve",
+    "render",
     "puzzles",
     "actions",
     # the verbs
