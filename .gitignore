@@ -26,3 +26,6 @@ test/expr_bundle.js
 
 # internal planning (not tracked)
 todo.md
+
+# Local-only saved layouts (not shipped)
+layouts/
