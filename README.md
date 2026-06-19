@@ -53,26 +53,35 @@ timeline silently; Mo only moves when you press Run, and then he stays at his fi
 
 ## Install & run
 
-You need Python ≥ 3.10 and Node ≥ 18 (only to rebuild the frontend).
-
 ```bash
-# 1. (one-time) build the 3D frontend bundle
-npm install
-npm run build
-
-# 2. install the Python package + marimo
-uv venv
-uv pip install -e ".[dev]"
-
-# 3. open the example notebook
-uv run marimo edit example.py
+pip install wanderland          # or: uv add wanderland
 ```
 
-Then run the cells. You'll see Mo standing in a warm low-poly world; running a program
-animates him through your commands step by step. Drag to orbit the camera.
+The published package ships the prebuilt 3D frontend — **no Node required**. It works in
+any notebook that supports [anywidget](https://anywidget.dev) (marimo, Jupyter). Open the
+example notebook to play:
 
-> If you just want to use the widget (not develop it), `pip install wanderland`
-> ships the prebuilt frontend — no Node required.
+```bash
+uv run marimo edit example.py   # the teaching playground
+uv run marimo edit rl_playground.py   # the agent / LLM-evaluation notebook
+```
+
+You'll see Mo standing in a warm low-poly world; running a program animates him through
+your commands step by step. Drag to orbit the camera. For headless / agent use, nothing
+needs a browser — `World.act(...)`, `solve(...)`, and `render(...)` all return synchronously
+(add `pip install "wanderland[rl]"` for the numpy image observation).
+
+<details>
+<summary>Develop from source (rebuild the frontend)</summary>
+
+Requires Python ≥ 3.10 and Node ≥ 18.
+
+```bash
+npm install && npm run build     # build the 3D bundle -> src/wanderland/static/index.js
+uv venv && uv pip install -e ".[dev]"
+uv run marimo edit example.py
+```
+</details>
 
 ---
 
