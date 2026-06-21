@@ -1,0 +1,69 @@
+[project]
+name = "wanderland"
+version = "0.1.1"
+description = "An interactive low-poly 3D coding playground (anywidget) for marimo: write Python commands and watch Mo the Mossball act them out."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Konstantin Taletskiy" }]
+keywords = ["anywidget", "marimo", "education", "learn-to-code", "three.js", "widget", "gridworld", "reinforcement-learning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: Jupyter",
+    "Topic :: Education",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "anywidget>=0.9.13",
+    "traitlets>=5.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/ktaletsk/wanderland"
+Repository = "https://github.com/ktaletsk/wanderland"
+Issues = "https://github.com/ktaletsk/wanderland/issues"
+
+[project.optional-dependencies]
+# Agent / RL extras: numpy for image observations (render().to_numpy()).
+rl = [
+    "numpy>=1.21",
+]
+dev = [
+    "marimo>=0.9",
+    "watchfiles>=0.21",
+    "numpy>=1.21",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wanderland"]
+
+[tool.hatch.build]
+# Ship the built JS bundle even though it may be gitignored during dev.
+artifacts = ["src/wanderland/static/*"]
+
+[tool.uv]
+# Local dev convenience; not required for end users.
+
+[tool.marimo.package_management]
+# Use uv for this project's notebooks (overrides any global marimo config).
+manager = "uv"
+
+[tool.marimo.runtime]
+# Auto-reload the editable package when its source changes, so notebook cells
+# pick up edits in the SAME tab without a server restart.
+auto_reload = "autorun"

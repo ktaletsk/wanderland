@@ -1,0 +1,292 @@
+{
+  "puzzle": {
+    "name": "Gem Path",
+    "cols": 4,
+    "rows": 3,
+    "start": [
+      0,
+      0
+    ],
+    "heading": "E",
+    "gems": [
+      [
+        3,
+        0
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "goal": [
+      3,
+      2
+    ],
+    "gaps": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ]
+    ],
+    "heights": {}
+  },
+  "timeline": [
+    {
+      "i": 0,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 1,
+        "row": 0,
+        "h": 1
+      },
+      "from": {
+        "col": 0,
+        "row": 0,
+        "h": 1
+      },
+      "to": {
+        "col": 1,
+        "row": 0,
+        "h": 1
+      }
+    },
+    {
+      "i": 1,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 2,
+        "row": 0,
+        "h": 1
+      },
+      "from": {
+        "col": 1,
+        "row": 0,
+        "h": 1
+      },
+      "to": {
+        "col": 2,
+        "row": 0,
+        "h": 1
+      }
+    },
+    {
+      "i": 2,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 3,
+        "row": 0,
+        "h": 1
+      },
+      "from": {
+        "col": 2,
+        "row": 0,
+        "h": 1
+      },
+      "to": {
+        "col": 3,
+        "row": 0,
+        "h": 1
+      }
+    },
+    {
+      "i": 3,
+      "cmd": "collect_gem",
+      "kind": "collect",
+      "ok": true,
+      "gem": [
+        3,
+        0
+      ],
+      "from": {
+        "col": 3,
+        "row": 0,
+        "h": 1
+      },
+      "to": {
+        "col": 3,
+        "row": 0,
+        "h": 1
+      }
+    },
+    {
+      "i": 4,
+      "cmd": "turn_right",
+      "kind": "turn",
+      "ok": true,
+      "from": {
+        "col": 3,
+        "row": 0,
+        "h": 1
+      },
+      "to": {
+        "col": 3,
+        "row": 0,
+        "h": 2
+      }
+    },
+    {
+      "i": 5,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 3,
+        "row": 1,
+        "h": 2
+      },
+      "from": {
+        "col": 3,
+        "row": 0,
+        "h": 2
+      },
+      "to": {
+        "col": 3,
+        "row": 1,
+        "h": 2
+      }
+    },
+    {
+      "i": 6,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 3,
+        "row": 2,
+        "h": 2
+      },
+      "from": {
+        "col": 3,
+        "row": 1,
+        "h": 2
+      },
+      "to": {
+        "col": 3,
+        "row": 2,
+        "h": 2
+      }
+    },
+    {
+      "i": 7,
+      "cmd": "turn_right",
+      "kind": "turn",
+      "ok": true,
+      "from": {
+        "col": 3,
+        "row": 2,
+        "h": 2
+      },
+      "to": {
+        "col": 3,
+        "row": 2,
+        "h": 3
+      }
+    },
+    {
+      "i": 8,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 2,
+        "row": 2,
+        "h": 3
+      },
+      "from": {
+        "col": 3,
+        "row": 2,
+        "h": 3
+      },
+      "to": {
+        "col": 2,
+        "row": 2,
+        "h": 3
+      }
+    },
+    {
+      "i": 9,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 1,
+        "row": 2,
+        "h": 3
+      },
+      "from": {
+        "col": 2,
+        "row": 2,
+        "h": 3
+      },
+      "to": {
+        "col": 1,
+        "row": 2,
+        "h": 3
+      }
+    },
+    {
+      "i": 10,
+      "cmd": "move_forward",
+      "kind": "move",
+      "ok": true,
+      "target": {
+        "col": 0,
+        "row": 2,
+        "h": 3
+      },
+      "from": {
+        "col": 1,
+        "row": 2,
+        "h": 3
+      },
+      "to": {
+        "col": 0,
+        "row": 2,
+        "h": 3
+      }
+    },
+    {
+      "i": 11,
+      "cmd": "collect_gem",
+      "kind": "collect",
+      "ok": true,
+      "gem": [
+        0,
+        2
+      ],
+      "from": {
+        "col": 0,
+        "row": 2,
+        "h": 3
+      },
+      "to": {
+        "col": 0,
+        "row": 2,
+        "h": 3
+      }
+    }
+  ],
+  "result": {
+    "ran": true,
+    "success": false,
+    "reached_goal": false,
+    "gems_collected": 2,
+    "total_gems": 2,
+    "final": {
+      "col": 0,
+      "row": 2,
+      "h": 3
+    },
+    "steps": 12
+  }
+}

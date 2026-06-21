@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../src/wanderland/static/index.css" />
+    <style>
+      #host { width: 640px; height: 480px; }
+    </style>
+  </head>
+  <body>
+    <div id="host"></div>
+    <script type="module">
+      import widget from "../src/wanderland/static/index.js";
+
+      const errors = [];
+      window.addEventListener("error", (e) => errors.push(String(e.message)));
+      window.addEventListener("unhandledrejection", (e) =>
+        errors.push("unhandled: " + String(e.reason && e.reason.message))
+      );
+
+      // Minimal stand-in for the anywidget model.
+      class MockModel {
+        constructor(s) {
+          this.s = s;
+          this.h = {};
+        }
+        get(k) { return this.s[k]; }
+        set(k, v) { this.s[k] = v; }
+        save_changes() {}
+        on(ev, fn) { (this.h[ev] = this.h[ev] || []).push(fn); }
+        off(ev, fn) { this.h[ev] = (this.h[ev] || []).filter((f) => f !== fn); }
+        emit(ev) { (this.h[ev] || []).forEach((f) => f()); }
+      }
+
+      async function run() {
+        const params = new URLSearchParams(location.search);
+        const fxFile = params.get("fx") || "fixture.json";
+        const fx = await (await fetch("./" + fxFile)).json();
+        const model = new MockModel({
+          puzzle: fx.puzzle,
+          timeline: [],
+          result: {},
+          load_nonce: 0,
+          run_nonce: 0,
+          speed: 24, // fast so the test finishes quickly
+          state: {},
+        });
+        const el = document.getElementById("host");
+        const cleanup = widget.render({ model, el });
+
+        const canvas = el.querySelector("canvas");
+        const hud = el.querySelector(".wanderland-hud-gems");
+        const status = el.querySelector(".wanderland-hud-status");
+
+        // load the program (arms the in-scene Run button, no autoplay)
+        model.s.timeline = fx.timeline;
+        model.s.result = fx.result;
+        model.s.load_nonce = 1;
+        model.emit("change:load_nonce");
+
+        const runBtn = el.querySelector(".wanderland-run-btn");
+        const armedOk = !!runBtn && !runBtn.disabled;
+        const noAutoplay = !(model.s.state && model.s.state.finished);
+
+        // click it, exactly like a user would
+        runBtn && runBtn.click();
+
+        // wait for the frontend to report completion via model.set("state", ...)
+        const start = performance.now();
+        while (!(model.s.state && model.s.state.finished)) {
+          if (performance.now() - start > 8000) break;
+          await new Promise((r) => setTimeout(r, 30));
+        }
+
+        const firstState = { ...model.s.state };
+
+        // --- second cycle: reload (Mo stays put), then Run again. This
+        // exercises the "return home" glide before the replay. ---
+        model.s.state = {};
+        model.s.load_nonce = 2;
+        model.emit("change:load_nonce");
+        const runBtn2 = el.querySelector(".wanderland-run-btn");
+        runBtn2 && runBtn2.click();
+        const start2 = performance.now();
+        while (!(model.s.state && model.s.state.finished)) {
+          if (performance.now() - start2 > 9000) break;
+          await new Promise((r) => setTimeout(r, 30));
+        }
+        const secondState = { ...model.s.state };
+
+        const gl = canvas && canvas.getContext("webgl2");
+        const statusText = status ? status.textContent.trim() : null;
+        cleanup();
+
+        return {
+          fxFile,
+          hasCanvas: !!canvas,
+          hudText: hud ? hud.textContent.trim() : null,
+          statusText,
+          webglOk: !!gl || !!(canvas && canvas.getContext("webgl")),
+          buttonArmed: armedOk,
+          noAutoplay,
+          state: firstState,
+          secondState,
+          expected: fx.result,
+          errors,
+        };
+      }
+
+      run().then((r) => { window.__done = r; }).catch((e) => {
+        window.__done = { fatal: String(e && e.stack || e), errors };
+      });
+    </script>
+  </body>
+</html>

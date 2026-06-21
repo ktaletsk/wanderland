@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180" role="img" aria-label="Wanderland: a top-down grid world with an agent facing a locked door, a key, and a goal ring">
+  <!-- A vector recreation of render() on the built-in locked_room world.
+       Palette and shape geometry mirror src/wanderland/render.py (tile = 60px). -->
+  <defs>
+    <clipPath id="round"><rect width="240" height="180" rx="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <!-- floor and grid -->
+    <rect width="240" height="180" fill="#abc77c"/>
+    <path d="M60 0V180M120 0V180M180 0V180M0 60H240M0 120H240" stroke="#97b36a" stroke-width="2"/>
+
+    <!-- walls at (2,0) and (2,2) -->
+    <g fill="#808892">
+      <rect x="120" y="0" width="60" height="60"/>
+      <rect x="120" y="120" width="60" height="60"/>
+    </g>
+
+    <!-- locked door at (2,1): a yellow bar with a keyhole -->
+    <rect x="128.4" y="66" width="43.2" height="48" rx="3" fill="#f0c64a"/>
+    <circle cx="150" cy="90" r="5.1" fill="#2c2c32"/>
+
+    <!-- key at (0,2): bow ring, shaft, tooth -->
+    <g fill="#f0c64a">
+      <circle cx="30" cy="150" r="8.4" fill="none" stroke="#f0c64a" stroke-width="4.8"/>
+      <rect x="27" y="145.2" width="6" height="21.6"/>
+      <rect x="33" y="156" width="7.8" height="5.4"/>
+    </g>
+
+    <!-- goal ring at (3,2) -->
+    <circle cx="210" cy="150" r="21.6" fill="none" stroke="#f0c84a" stroke-width="7.2"/>
+
+    <!-- agent at (0,0), facing east -->
+    <polygon points="12,14.4 12,45.6 50.4,30" fill="#d64a3a"/>
+  </g>
+</svg>

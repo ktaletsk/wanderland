@@ -1,0 +1,9 @@
+name: wanderland-env
+channels:
+  - emscripten-forge
+  - conda-forge
+dependencies:
+  - xeus-python
+  - anywidget
+  - pip:
+    - wanderland

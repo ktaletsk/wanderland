@@ -1,0 +1,183 @@
+.wanderland-pg {
+  --wanderland-bg: linear-gradient(180deg, #cdebff 0%, #bfe6ff 55%, #d8f1ff 100%);
+  --wanderland-shadow: 0 10px 30px rgba(40, 90, 140, 0.18);
+  --wanderland-pill-bg: rgba(255, 255, 255, 0.82);
+  --wanderland-pill-text: #1f4a63;
+  --wanderland-pill-shadow: 0 2px 8px rgba(40, 90, 140, 0.18);
+  --wanderland-status-bg: rgba(90, 120, 140, 0.9);
+  --wanderland-run-bg: rgba(255, 255, 255, 0.94);
+  --wanderland-run-bg-hover: #fff;
+  --wanderland-run-text: #1f7a3d;
+  --wanderland-run-disabled: #6b7c88;
+  --wanderland-run-shadow: 0 4px 14px rgba(40, 90, 140, 0.28);
+  --wanderland-run-shadow-hover: 0 6px 18px rgba(40, 90, 140, 0.34);
+  --wanderland-gem: #1fb6e6;
+  position: relative;
+  width: 100%;
+  height: 480px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--wanderland-bg);
+  box-shadow: var(--wanderland-shadow);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.wanderland-pg[data-wanderland-theme="dark"] {
+  --wanderland-bg: radial-gradient(circle at 50% 8%, #263889 0%, #0b1645 58%, #060a28 100%);
+  --wanderland-shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
+  --wanderland-pill-bg: rgba(8, 14, 38, 0.74);
+  --wanderland-pill-text: #e7f6ff;
+  --wanderland-pill-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+  --wanderland-status-bg: rgba(35, 46, 78, 0.92);
+  --wanderland-run-bg: rgba(9, 16, 42, 0.86);
+  --wanderland-run-bg-hover: rgba(18, 29, 72, 0.94);
+  --wanderland-run-text: #bff0c8;
+  --wanderland-run-disabled: #9ba8bf;
+  --wanderland-run-shadow: 0 4px 18px rgba(0, 0, 0, 0.46);
+  --wanderland-run-shadow-hover: 0 6px 22px rgba(0, 0, 0, 0.56);
+  --wanderland-gem: #ff426d;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wanderland-pg:not([data-wanderland-theme]) {
+    --wanderland-bg: radial-gradient(circle at 50% 8%, #263889 0%, #0b1645 58%, #060a28 100%);
+    --wanderland-shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
+    --wanderland-pill-bg: rgba(8, 14, 38, 0.74);
+    --wanderland-pill-text: #e7f6ff;
+    --wanderland-pill-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+    --wanderland-status-bg: rgba(35, 46, 78, 0.92);
+    --wanderland-run-bg: rgba(9, 16, 42, 0.86);
+    --wanderland-run-bg-hover: rgba(18, 29, 72, 0.94);
+    --wanderland-run-text: #bff0c8;
+    --wanderland-run-disabled: #9ba8bf;
+    --wanderland-run-shadow: 0 4px 18px rgba(0, 0, 0, 0.46);
+    --wanderland-run-shadow-hover: 0 6px 22px rgba(0, 0, 0, 0.56);
+    --wanderland-gem: #ff426d;
+  }
+}
+
+.wanderland-pg canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: grab;
+}
+.wanderland-pg canvas:active {
+  cursor: grabbing;
+}
+
+.wanderland-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wanderland-hud-gems {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--wanderland-pill-bg);
+  backdrop-filter: blur(6px);
+  color: var(--wanderland-pill-text);
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: var(--wanderland-pill-shadow);
+}
+
+.wanderland-gem-icon {
+  color: var(--wanderland-gem);
+  font-size: 15px;
+}
+
+.wanderland-hud-status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  background: var(--wanderland-status-bg);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.wanderland-hud-status[data-kind="win"] {
+  background: linear-gradient(180deg, #4ec97a, #34a861);
+}
+.wanderland-hud-status[data-kind="done"] {
+  background: var(--wanderland-status-bg);
+}
+
+/* In-scene Run button (bottom-center) */
+.wanderland-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.wanderland-run-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--wanderland-run-text);
+  background: var(--wanderland-run-bg);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--wanderland-run-shadow);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.wanderland-run-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--wanderland-run-shadow-hover);
+  background: var(--wanderland-run-bg-hover);
+}
+.wanderland-run-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.wanderland-run-btn:disabled {
+  cursor: default;
+  color: var(--wanderland-run-disabled);
+  opacity: 0.9;
+}
+.wanderland-run-btn[data-state="running"] {
+  color: var(--wanderland-run-disabled);
+}
+
+.wanderland-run-icon {
+  font-size: 12px;
+  color: #2bbd57;
+  transform: translateY(0.5px);
+}
+.wanderland-run-btn:disabled .wanderland-run-icon {
+  color: #9aa6ae;
+}
+
+.wanderland-run-spin {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(90, 107, 120, 0.35);
+  border-top-color: #5a6b78;
+  border-radius: 50%;
+  animation: wanderland-spin 0.7s linear infinite;
+}
+@keyframes wanderland-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
