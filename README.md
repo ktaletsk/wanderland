@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marimo.app/?src=https%3A%2F%2Fraw.githubusercontent.com%2Fktaletsk%2Fwanderland%2Frefs%2Fheads%2Fmain%2Fexample.py"><img src="https://marimo.io/shield.svg" alt="Open in marimo" height="20"></a>
+  <a href="https://marimo.app/?src=https%3A%2F%2Fraw.githubusercontent.com%2Fktaletsk%2Fwanderland%2Frefs%2Fheads%2Fmain%2Fexample.py&mode=read"><img src="https://marimo.io/shield.svg" alt="Open in marimo" height="20"></a>
   <a href="https://notebook.link/github.com/ktaletsk/wanderland/?path=example.ipynb"><img src="https://img.shields.io/badge/notebook-link-e2d610?logo=jupyter&logoColor=white" alt="Open on notebook.link" height="20"></a>
 </p>
 
